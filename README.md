@@ -63,15 +63,18 @@ Port                            Protocol Typ               Board Name FQBN Core
 
 Details about this can be found here: https://arduino.github.io/arduino-cli/0.21/getting-started/#connect-the-board-to-your-pc
 
-### Build with the build.sh script
+### Build with the build_and_upload.sh script
+
+This script is atm configured for my Mac and the Wemos D1 Mini. Use it as the base for you own build script and replace it with 
+the correct board type and port.
+
+Just call the script ```./build_and_upload.sh```. That`s it.
 
 ### Manual build process
-
-To build it manually, you need to enter you WIFI AP credentials in the priva
 
 We use the Wemos D1 Mini board here, which is based on the NodeMCU with ESP8266 on a Mac. So the build command itself looks like this:
 
 ```sh
 arduino-cli compile --fqbn esp8266:esp8266:d1 TableDevice
-
+arduino-cli upload -p /dev/cu.usbserial-142230 --fqbn esp8266:esp8266:d1 TableDevice
 ```
