@@ -6,6 +6,9 @@
 #include "ClubApi.h"
 #include "CardList.h"
 
+/* we get the secrets from a external header that will be generadted by the build script */
+#include "secret_credentials.h"
+
 /* ************************************************************
  * CONFIGURATIONS
  * ************************************************************ */
@@ -13,13 +16,6 @@
 #define RST_PIN         0          // Pin: D3
 #define RELAIS_COM_PIN  16
 #define DISPLAY_TIMEOUT_THRESHOLD 10000
-
-const char*  WIFI_SSID    = "<INSERT-SSID>";
-const char*  WIFI_PWD     = "<INSERT-WIFI-KEY>";
-const String API_BASE_URL = "http://192.168.2.103:3000/club-api";
-const String API_USERNAME = "table_s1";
-const String API_PASSWORD = "<INSERT-USER-PWD>";
-const String API_USERAGENT= "Snooker_Table_1";
 
 /* ************************************************************
  * GLOBAL VARIABLES
@@ -30,7 +26,7 @@ bool         TRIGGER_CARD_CHANGE=false;
 String       init_error="";
 ClubLcd      lcd;
 ClubRfid     rfid;
-ClubApi      api(API_BASE_URL, API_USERAGENT);
+ClubApi      api(SECRET_API_BASEURL, SECRET_API_USERAGENT);
 ClubNet      net;
 CardList     cardList(4);
 
@@ -95,8 +91,8 @@ void setup() {
    * CONNECT WIFI NETWORK
    * ************************************************************ */
   log("Connect WIFI...", &lcd);
-  log((String)"SSID=" + WIFI_SSID);
-  if (!net.setupWifi(WIFI_SSID, WIFI_PWD)) {
+  log((String)"SSID=" + SECRET_WIFI_SSID);
+  if (!net.setupWifi(SECRET_WIFI_SSID, SECRET_WIFI_KEY)) {
     init_error=net.getLastError();
     goto INIT_FAILED;
   }
@@ -118,7 +114,7 @@ void setup() {
    * API LOGIN
    * ************************************************************ */
   log("Login to DB...", &lcd);
-  if(!api.authenticate(API_USERNAME, API_PASSWORD)) {
+  if(!api.authenticate(SECRET_TABLE_USERNAME, SECRET_TABLE_PASSWORD)) {
     init_error="No DB Login!";
     log_api_error(&api);
     goto INIT_FAILED;
