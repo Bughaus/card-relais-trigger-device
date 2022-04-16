@@ -1,9 +1,21 @@
 # billard-club-table-device
 Code for running an Arduino device for controlling the light by an RFID card system.
 
-## Schematics
+## Schematics and components
 
 ![Steckplatine](/schematics/TableDevice_Steckplatine.png)
+
+The components used in the schematics are the following:
+
+  * Arduino Wemos D1 Mini
+  * RFID RC-522 (MFRC522)
+  * 1-Channel-Relay-Module with optocoupler  (High / Low-Level-Control)
+  * 16x2 LCD with I2C Driver (e.g. the Fundino one)
+  * Pemenol DC-DC buck converter (3.2-40V in to 1.25-35V out)
+
+The output of the buck converter is set to the 5V needed by most of the components except the RFID reader.
+As a power source a 9V battery block or power supply of your choice with at least 6.5V output can be used.
+If you have good 5V power supply, the whole buck converter part can be ignored.
 
 ## Building via Arudino CLI
 
