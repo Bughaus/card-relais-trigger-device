@@ -21,6 +21,7 @@ class ClubLcd {
     void setup(unsigned int threshold);
     void setDisplayBacklightThreshold(unsigned int threshold);
     void displayBacklightOff();
+    void displayBacklightOn();
     void printMsg(String msg);
 };
 

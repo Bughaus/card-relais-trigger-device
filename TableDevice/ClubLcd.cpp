@@ -4,7 +4,6 @@ ClubLcd::ClubLcd() {}
 ClubLcd::~ClubLcd() {}
 
 void ClubLcd::printMsg(String msg) {
-  _lcd->backlight();
   if      (_lcdRow1 == "") _lcdRow1 = msg;
   else if (_lcdRow2 == "") _lcdRow2 = msg;
   else {
@@ -17,8 +16,7 @@ void ClubLcd::printMsg(String msg) {
   _lcd->print(_lcdRow1);
   _lcd->setCursor(0,1);
   _lcd->print(_lcdRow2);
-  _lastDisplayOn = millis();
-  _displayBacklightOn = true;
+  displayBacklightOn();
 }
 
 void ClubLcd::setup() {
@@ -41,4 +39,10 @@ void ClubLcd::displayBacklightOff() {
     _lcd->noBacklight();
     _displayBacklightOn = false;
   }
+}
+
+void ClubLcd::displayBacklightOn() {
+  _lastDisplayOn = millis();
+  _displayBacklightOn = true;
+  _lcd->backlight();
 }

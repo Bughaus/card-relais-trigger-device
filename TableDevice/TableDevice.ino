@@ -13,7 +13,8 @@
  * CONFIGURATIONS
  * ************************************************************ */
 #define SS_PIN          15         // Pin: D8
-#define RST_PIN         0          // Pin: D3
+#define RST_PIN          0         // Pin: D3
+#define LINE_TRIGGER_PIN 2         // Pin: D4
 #define RELAIS_COM_PIN  16
 #define DISPLAY_TIMEOUT_THRESHOLD 10000
 
@@ -68,6 +69,7 @@ void setup() {
    * ************************************************************ */
   Serial.begin(115200);
   pinMode(RELAIS_COM_PIN, OUTPUT);
+  pinMode(LINE_TRIGGER_PIN, INPUT);
 
   /* ************************************************************
    * Declare vars that collide with the jump labels
@@ -167,6 +169,10 @@ INIT_END:
  * LOOP
  * ************************************************************************************************************************ */
 void loop() {
+  if (digitalRead(LINE_TRIGGER_PIN) == LOW) {
+    lcd.displayBacklightOn();
+  }
+
 
   /*
    * Only when INIT was succesful and a card is presented
