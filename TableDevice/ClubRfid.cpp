@@ -16,7 +16,8 @@ bool ClubRfid::cardPresent() {
 }
 
 String ClubRfid::getUid() {
-  _mfrc522->PICC_ReadCardSerial();
+  if (!_mfrc522->PICC_ReadCardSerial())
+    return "";
   
   char idBuffer[32];
   for (unsigned int i = 0; i < _mfrc522->uid.size; i++) {
