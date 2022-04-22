@@ -9,6 +9,11 @@
 /* we get the secrets from a external header that will be generadted by the build script */
 #include "secret_credentials.h"
 
+/* if OTA password is given? */
+#ifdef OTA_FLASH_PASSWORD
+  #include <ArduinoOTA.h>
+#endif
+
 /* ************************************************************
  * CONFIGURATIONS
  * ************************************************************ */
@@ -34,10 +39,10 @@ CardList     cardList(4);
 /* ************************************************************************************************************************
  * FUNCTIONS
  * ************************************************************************************************************************ */
-void log(String msg, ClubLcd *lcd=0) {
+void log(String msg, ClubLcd *lcd=0, int row=-1, int col=-1) {
   Serial.println(msg);
   if (!lcd) return;
-  lcd->printMsg(msg);
+  lcd->printMsg(msg, row, col);
 }
 
 void log_api_error(ClubApi *api) {
@@ -88,6 +93,42 @@ void setup() {
    * ************************************************************ */
   rfid.setup(SS_PIN, RST_PIN);
   log("RFID ready!",  &lcd);
+
+  /* ************************************************************
+   * SETUP OTA IF OTA PW IS DEFINED
+   * ************************************************************ */
+#ifdef OTA_FLASH_PASSWORD
+    ArduinoOTA.setHostname(OTA_HOSTNAME);
+    ArduinoOTA.setPassword(OTA_FLASH_PASSWORD);
+    ArduinoOTA.onStart([]() {
+      log("OTA flashing", &lcd);
+      log("", &lcd);
+      log("[", &lcd, 1, 0);
+      log("]", &lcd, 1, 15);
+    });
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+      String progressOut = "";
+      int progCnt = progress / (total / 14);
+      for (int i = 0; i < progCnt; i++) { progressOut += "#"; }
+      log(progressOut, &lcd, 1, 1);
+    });
+    ArduinoOTA.onError([](ota_error_t error) {
+      log("OTA flash error:");
+      if (error == OTA_AUTH_ERROR) log("Auth Failed", &lcd);
+      else if (error == OTA_BEGIN_ERROR) log("Begin Failed", &lcd);
+      else if (error == OTA_CONNECT_ERROR) log("Connect Failed", &lcd);
+      else if (error == OTA_RECEIVE_ERROR) log("Receive Failed", &lcd);
+      else if (error == OTA_END_ERROR) log("End Failed", &lcd);
+      delay(5000);
+    });
+    ArduinoOTA.onEnd([]() {
+      log("OTA flash", &lcd);
+      log("successful!", &lcd);
+      delay(5000);
+    });
+    ArduinoOTA.begin();
+    log("OTA ready!",  &lcd);
+#endif
 
   /* ************************************************************
    * CONNECT WIFI NETWORK
@@ -156,9 +197,7 @@ INIT_FAILED:
   
 INIT_OK:
   log("Init OK!");
-  log("Waiting for Token.");
-  log("Kein Spieler", &lcd);
-  log("angemeldet.", &lcd);
+  TRIGGER_CARD_CHANGE=true;
   
 INIT_END:
   log("Init finished.");
@@ -169,10 +208,14 @@ INIT_END:
  * LOOP
  * ************************************************************************************************************************ */
 void loop() {
+  // do we have a OTA passphrase? Then enable STA
+#ifdef OTA_FLASH_PASSWORD
+  ArduinoOTA.handle();
+#endif
+
   if (digitalRead(LINE_TRIGGER_PIN) == LOW) {
     lcd.displayBacklightOn();
   }
-
 
   /*
    * Only when INIT was succesful and a card is presented
@@ -182,7 +225,22 @@ void loop() {
      * Get UID
      * ************************************************************ */
     String cardId=rfid.getUid();
+    if (cardId.length() == 0) {
+      goto END_OF_LOOP;
+    }
     log((String)"Card UId=" + cardId);  
+
+    /* ************************************************************
+     * API Connection alive?
+     * ************************************************************ */
+    if (!api.loginOk()) {
+      log("Relogin to API");
+      if(!api.authenticate(SECRET_TABLE_USERNAME, SECRET_TABLE_PASSWORD)) {
+        log_api_error(&api);
+        goto REQUEST_ERROR;
+      }
+      log("Relogin OK.", &lcd);
+    } 
 
     /* ************************************************************
      * Is the card present in the card list?
