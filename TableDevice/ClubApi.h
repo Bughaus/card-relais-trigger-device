@@ -35,6 +35,7 @@ class ClubApi {
     int    getResponseAttributeArrLen(String attr);
     String getResponseAttributeArrEl(String attr, int idx);
     bool checkConnection();
+    bool loginOk();
     bool authenticate(String username, String password);
     bool sessionStart(String cardId);
     bool sessionStop(String cardId);

@@ -84,6 +84,13 @@ bool ClubApi::checkConnection() {
   return false;
 }
 
+bool ClubApi::loginOk() {
+  if (_makeRequest("GET", "/connectionOk") && _lastStatusCode == 200 && _lastResponse == "{\"$ok\":true}") {
+    return true;
+  } 
+  return false;
+}
+
 bool ClubApi::authenticate(String username, String password) {
   String credentials = "{\"username\":\"" + username + "\",\"password\":\""+ password +"\"}";
   
