@@ -3,19 +3,27 @@
 ClubLcd::ClubLcd() {}
 ClubLcd::~ClubLcd() {}
 
-void ClubLcd::printMsg(String msg) {
-  if      (_lcdRow1 == "") _lcdRow1 = msg;
-  else if (_lcdRow2 == "") _lcdRow2 = msg;
-  else {
-    _lcdRow1 = _lcdRow2;
-    _lcdRow2 = msg;
+void ClubLcd::printMsg(String msg, int row=-1, int col=-1) {
+  // do we have a specific row and col?
+  if (row >= 0 && col >= 0) {
+    _lcd->setCursor(col, row);
+    _lcd->print(msg);
   }
-  
-  _lcd->clear();
-  _lcd->setCursor(0,0);
-  _lcd->print(_lcdRow1);
-  _lcd->setCursor(0,1);
-  _lcd->print(_lcdRow2);
+  // if not, default loggin scheme: "scroll down and append new line"
+  else {
+    if      (_lcdRow1 == "") _lcdRow1 = msg;
+    else if (_lcdRow2 == "") _lcdRow2 = msg;
+    else {
+      _lcdRow1 = _lcdRow2;
+      _lcdRow2 = msg;
+    }
+    _lcd->clear();
+    _lcd->setCursor(0,0);
+    _lcd->print(_lcdRow1);
+    _lcd->setCursor(0,1);
+    _lcd->print(_lcdRow2);
+  }
+
   displayBacklightOn();
 }
 

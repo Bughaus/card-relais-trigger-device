@@ -23,6 +23,7 @@ class ClubLcd {
     void displayBacklightOff();
     void displayBacklightOn();
     void printMsg(String msg);
+    void printMsg(String msg, int row, int col);
 };
 
 #endif
