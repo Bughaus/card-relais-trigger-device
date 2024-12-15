@@ -1,4 +1,4 @@
-# billard-club-table-device
+# card-relais-trigger-device
 Code for running an Arduino device for controlling the light by an RFID card system.
 
 ## Schematics and components
